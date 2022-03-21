@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+
+<head>
+<title>Page Title Goes Here</title>
+<meta charset="utf-8">
+<script type = 'text/javascript'>
+		function printIMG(num) {
+		if (num > 10) {
+			num = 14;
+			alert('You Lost.');
+		}
+		document.write("<img src='HIMG/H" + num + ".GIF'><br />");
+		
+	}
+	
+	function wordBlendr(wrd1, wrd2) {
+		//alert(document.getElementById('guess').value);
+		var pos;
+		var ary = new Array();
+		
+		len2 = wrd2.length; len1 = wrd1.length;
+		ary.length = len1;
+		for (i=0; i<len1; i++) {     // Initialize ary
+			ary[i] = "*";
+		}
+		for (i=0; i<len2; i++) {     // For each char in word2
+			char = wrd2.charAt(i);     //   get char
+			pos = wrd1.indexOf(char);  //   get its position
+			while (pos != -1) {
+			ary[pos] = char;
+			pos = wrd1.indexOf(char, pos+1);  // get new position
+			}
+		}
+
+		for (i=0; i<len1; i++)  {    // Print out array contents
+			document.write(ary[i]);
+		}
+	}
+	
+	function getVar(addr, key) {
+		var tmp = addr;
+		var pos, pos2, varname, varval;
+
+		pos = tmp.indexOf("?");		// Are there vars?
+		if (pos == -1)
+			tmp = "";
+		else
+			tmp = tmp.substring(pos+1);
+
+		while (tmp.length > 0) {
+			pos = tmp.indexOf("=");     // get var name
+			varname = tmp.substring(0,pos);
+
+			pos2 = tmp.indexOf("&");    // get var value
+			if (pos2==-1) {		// if at end of string, or no vars
+				varval = tmp.substring(pos+1);
+				tmp = "";
+			}
+			else {			// if not last var
+				varval = tmp.substring(pos+1, pos2);
+			tmp = tmp.substring(pos2+1); // discard processed string
+			}				
+			// document.write(varname + ": " + varval + "<br />");
+			if (key == varname)
+			return varval;
+		}
+		return "";			// return empty string
+	}
+	
+	function btnClik_onclick() {	
+		var guess = document.form1.guess.value;
+		var seekrit = document.getElementById('seekrit').value;
+		var cliks = 0;
+		var strAddr = window.location.href;
+		var right = getVar(strAddr, 'right');
+		var wrong = getVar(strAddr, 'wrong');
+		
+		
+		
+		guess = guess.trim(); 
+		guess = guess.charAt(0);
+		guess = guess.toLowerCase();
+		
+		if (seekrit.includes(guess) != true) {
+			wrong = wrong + guess;
+			window.location.href = setVar(strAddr, 'wrong', wrong);
+		}
+		else {
+			right = right + guess;
+			window.location.href = setVar(strAddr, 'right', right);
+		}
+		
+		
+		
+		
+		//printIMG(wrong.length);
+		//wordBlendr(seekrit, guess);
+		
+		
+	}
+	
+	
+	
+	function btnGuess_onclick() {
+		var strAddr = window.location.href;
+		//var guess = document.getElementById('guess').value;
+		var seekrit = document.getElementById('seekrit').value;
+		
+		var right, wrong;
+		
+		var cliks = 0;
+		
+		if (strAddr.indexOf('?') == -1) {
+			newAddr = strAddr + '?cliks=1';
+		}
+		
+		else {
+			pos = strAddr.indexOf('cliks=');
+			cliks = parseInt(strAddr.substring(pos+6));
+			cliks++;
+			newAddr = strAddr.substr(0, pos+6) + cliks;
+		}
+		strAddr = newAddr;
+		
+		
+			if (strAddr.indexOf('&') == -1) {
+				newAddr = strAddr + '&right=' + '&wrong=';
+			}
+				
+			else if (seekrit.includes(guess) == true) {
+				pos = strAddr.indexOf('right=');
+				right = parseInt(strAddr.substring(pos+7));
+				right = right + guess;
+				newAddr = strAddr.substr(0, pos+7) + right;
+			}
+			
+			
+			else {
+				pos = strAddr.indexOf('wrong=');
+				wrong = parseInt(strAddr.substring(pos+7));
+				wrong = wrong + guess;
+				newAddr = strAddr.substr(0, pos+7) + wrong;
+			}
+			window.location.href = newAddr;
+		//if (97 <= guess <= 122) {
+			
+	}
+	
+	function setVar(addr, key, val) {
+		  var tmp = addr.toLowerCase();
+		  var blnQuest = false;
+		  var pos, pos2, varname, varval;
+
+		  key=key.toLowerCase();
+		  blnQuest = (tmp.indexOf("?") > -1);
+
+		  if (blnQuest) {       	// found '?'
+			pos = tmp.indexOf(key + "=");
+			if (pos > -1) {     	// found key
+			  pos = pos + key.length + 1;
+			  pos2 = tmp.indexOf("&", pos+1);
+			  if (pos2 > -1) {  	// found '&'
+				tmp = tmp.substring(0, pos) + val + tmp.substring(pos2); }
+			  else {   		// no &; it is last var
+				tmp = tmp.substring(0, pos) + val; }
+			}
+			else {		// key not in variable-string; add to end
+			  tmp = addr + "&" + key + "=" + val;
+			}
+		  }
+		  else {  		// no vars; add onto end of addr
+			tmp = addr + "?" + key + "=" + val;
+		  }
+		  return tmp;
+	}
+	
+	function isValid(guess) {
+		var seekrit = document.getElementById('seekrit').value;
+		if (seekrit.includes(guess)) {
+			return 'right';
+		}
+		else { return 'wrong' }
+	}
+	
+	
+
+</script>
+</head>
+<body>
+	
+	<form name="form1">   <!-- Create form, with button -->
+		<input type = 'hidden' value = 'apallo' id = "seekrit" />
+		<input type = "text" id = "guess" name = 'guess' />
+		<input type="button" value="Click Me"
+			name="btnClicks" onclick='btnClik_onclick()'/>
+
+	</form>
+	
+	
+<script type = 'text/javascript'>
+	var seekrit = document.getElementById('seekrit').value;
+	var addr = window.location.href;
+	var right = getVar(addr, 'right');
+	var wrong = getVar(addr, 'wrong');
+	
+	printIMG(wrong.length);
+	wordBlendr(seekrit, right);
+	
+		
+	
+	
+	//get var code
+	
+	
+	//document.write("<br><br>" + kee + ": <b>" + getVar(addr, kee) + "</b><br>");
+
+</script>
+</body>
+</html>
